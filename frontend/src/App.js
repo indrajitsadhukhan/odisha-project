@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
 import { useSpeechSynthesis } from "react-speech-kit";
@@ -6,10 +6,10 @@ import env from "react-dotenv";
 
 import Mic from "./asset/micBtn.svg";
 import Speak from "./asset/speak.jpg";
-import { ResultReason } from 'microsoft-cognitiveservices-speech-sdk';
+import { ResultReason,SpeechSynthesizer } from "microsoft-cognitiveservices-speech-sdk";
 
-const sdk= require("microsoft-cognitiveservices-speech-sdk")
-const BASE_URL ="http://localhost:8080";
+const sdk = require("microsoft-cognitiveservices-speech-sdk");
+const BASE_URL = "http://localhost:8080";
 
 // const SpeechRecognition =
 //   window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -30,79 +30,94 @@ function App() {
   const { speak, cancel } = useSpeechSynthesis();
   useEffect(() => {
     // Update the document title using the browser API
-    cancel()
+    cancel();
   });
 
+  const speechConfig = sdk.SpeechConfig.fromSubscription(
+    env.SPEECH_KEY,
+    env.SPEECH_REGION
+  );
+  speechConfig.speechRecognitionLanguage = "bn-IN";
+  speechConfig.speechSynthesisVoiceName = "bn-IN-TanishaaNeural";
 
-//   const handleListen = async (listenStatus) => {
-//     if(listenStatus){
-//       setNote("");
-//       cancel()
-//       setSavedNote("Listening to your input...")
-// const speechConfig = sdk.SpeechConfig.fromSubscription(env.SPEECH_KEY,env.SPEECH_REGION);
-// let audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
-// let speechRecognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
-// speechConfig.speechRecognitionLanguage = "bn-IN";
+  const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
+  const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
+  const audioConfigSpeaker = sdk.AudioConfig.fromDefaultSpeakerOutput();
+  const speechSynthesizer = new SpeechSynthesizer(
+    speechConfig,
+    audioConfigSpeaker
+  );
 
-//     speechRecognizer.recognizeOnceAsync(result => {
-//       switch (result.reason) {
-//           case sdk.ResultReason.RecognizedSpeech:
-//               console.log(`RECOGNIZED: Text=${result.text}`);
-              
-//               setNote(result.text)
-//               break;
-//           case sdk.ResultReason.NoMatch:
-//               console.log("NOMATCH: Speech could not be recognized.");
-//               break;
-//           case sdk.ResultReason.Canceled:
-//               const cancellation = sdk.CancellationDetails.fromResult(result);
-//               console.log(`CANCELED: Reason=${cancellation.reason}`);
 
-//               if (cancellation.reason == sdk.CancellationReason.Error) {
-//                   console.log(`CANCELED: ErrorCode=${cancellation.ErrorCode}`);
-//                   console.log(`CANCELED: ErrorDetails=${cancellation.errorDetails}`);
-//                   console.log("CANCELED: Did you set the speech resource key and region values?");
-//               }
-//               break;
-//       }
-//       speechRecognizer.close();
-//     })
-    
-//   }
-//   else{
-//     await handleSaveNote()
-//   }
-    
-//     // if (listenStatus) {
-//     //   setNote("");
-//     //   mic.start();
-//     //   mic.onend = () => {
-//     //     mic.start();
-//     //   };
-//     //   setSavedNote("Listening to your input...");
-//     //   cancel();
-//     // } else {
-//     //   mic.stop();
-//     //   mic.onend = () => {};
-//     //   await handleSaveNote();
-//     // }
+  //   const handleListen = async (listenStatus) => {
+  //     if(listenStatus){
+  //       setNote("");
+  //       cancel()
+  //       setSavedNote("Listening to your input...")
+  // const speechConfig = sdk.SpeechConfig.fromSubscription(env.SPEECH_KEY,env.SPEECH_REGION);
+  // let audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
+  // let speechRecognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
+  // speechConfig.speechRecognitionLanguage = "bn-IN";
 
-//     // mic.onstart = () => {};
-//     // mic.onresult = (event) => {
-//     //   const transcript = Array.from(event.results)
-//     //     .map((result) => result[0])
-//     //     .map((result) => result.transcript)
-//     //     .join("");
-//     //   setNote(transcript);
-//     //   mic.onerror = (event) => {
-//     //     console.log(event.error);
-//     //     setNote("");
-//     //   };
-//     // };
-//   };
+  //     speechRecognizer.recognizeOnceAsync(result => {
+  //       switch (result.reason) {
+  //           case sdk.ResultReason.RecognizedSpeech:
+  //               console.log(`RECOGNIZED: Text=${result.text}`);
+
+  //               setNote(result.text)
+  //               break;
+  //           case sdk.ResultReason.NoMatch:
+  //               console.log("NOMATCH: Speech could not be recognized.");
+  //               break;
+  //           case sdk.ResultReason.Canceled:
+  //               const cancellation = sdk.CancellationDetails.fromResult(result);
+  //               console.log(`CANCELED: Reason=${cancellation.reason}`);
+
+  //               if (cancellation.reason == sdk.CancellationReason.Error) {
+  //                   console.log(`CANCELED: ErrorCode=${cancellation.ErrorCode}`);
+  //                   console.log(`CANCELED: ErrorDetails=${cancellation.errorDetails}`);
+  //                   console.log("CANCELED: Did you set the speech resource key and region values?");
+  //               }
+  //               break;
+  //       }
+  //       speechRecognizer.close();
+  //     })
+
+  //   }
+  //   else{
+  //     await handleSaveNote()
+  //   }
+
+  //     // if (listenStatus) {
+  //     //   setNote("");
+  //     //   mic.start();
+  //     //   mic.onend = () => {
+  //     //     mic.start();
+  //     //   };
+  //     //   setSavedNote("Listening to your input...");
+  //     //   cancel();
+  //     // } else {
+  //     //   mic.stop();
+  //     //   mic.onend = () => {};
+  //     //   await handleSaveNote();
+  //     // }
+
+  //     // mic.onstart = () => {};
+  //     // mic.onresult = (event) => {
+  //     //   const transcript = Array.from(event.results)
+  //     //     .map((result) => result[0])
+  //     //     .map((result) => result.transcript)
+  //     //     .join("");
+  //     //   setNote(transcript);
+  //     //   mic.onerror = (event) => {
+  //     //     console.log(event.error);
+  //     //     setNote("");
+  //     //   };
+  //     // };
+  //   };
 
   async function askQuestion(prompt) {
-    console.log("Question asked.")
+    console.log("Question asked.");
     const response = await fetch(BASE_URL + "/completion", {
       method: "POST",
       headers: {
@@ -124,10 +139,10 @@ function App() {
     setSavedNote("Processing your input...");
     // setNote(displayText)
     // console.log("Note-2: "+displayText)
-    
+
     let res = await askQuestion(displayText);
     setSavedNote(res.split("\n").map((str) => <p>{str}</p>));
-    speak({ text: res });
+    speaker(res)
   };
 
   const HandleSpeak = () => {
@@ -135,43 +150,51 @@ function App() {
     startFromMic(!isListening);
   };
 
+  async function speaker(output){
+    speechSynthesizer.speakTextAsync(
+      output,
+      (result) => {
+        if (result) {
+          speechSynthesizer.close();
+          console.log(result.audioData)
+          return result.audioData;
+        }
+      },
+      (error) => {
+        console.log(error);
+        speechSynthesizer.close();
+      }
+    );
+  }
+
   async function startFromMic(isListening) {
-    if(isListening)
-    {
-      const speechConfig = sdk.SpeechConfig.fromSubscription(env.SPEECH_KEY,env.SPEECH_REGION);
-      speechConfig.speechRecognitionLanguage = 'bn-IN';
-      const audioConfig = sdk.AudioConfig.fromDefaultMicrophoneInput();
-      const recognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
+    if (isListening) {
+      // Recognize speech and convert to text.
+      setSavedNote("Listening..");
 
-    // this.setState({
-    //     displayText: 'speak into your microphone...'
-    // });
-    
-    setSavedNote("Listening..")
-
-    recognizer.recognizeOnceAsync(async result => {
+      recognizer.recognizeOnceAsync(async (result) => {
         let displayText;
         if (result.reason === ResultReason.RecognizedSpeech) {
-            displayText = `${result.text}`
+          displayText = `${result.text}`;
         } else {
-            displayText = 'ERROR: Speech was cancelled or could not be recognized. Ensure your microphone is working properly.';
+          displayText =
+            "ERROR: Speech was cancelled or could not be recognized. Ensure your microphone is working properly.";
         }
-        setNote(displayText)
-        console.log(displayText)
-        await handleSaveNote(displayText)
-        
+        setNote(displayText);
+        console.log(displayText);
+        await handleSaveNote(displayText);
+
         // this.setState({
         //     displayText: displayText
         // });
-    });
+      });
+
+      // Convert text to speech : https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support?tabs=tts
+
+    } else {
+      await handleSaveNote();
+    }
   }
-  else{
-    await handleSaveNote()
-  }
-}
-
-
-
 
   return (
     <div className="main-div">

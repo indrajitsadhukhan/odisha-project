@@ -18,7 +18,8 @@ function generatePrompt(prompt) {
     return {
         'prompt': prompt,
         'max_tokens': 1000,
-        'temperature': 0.3,
+        'temperature': 0,
+        'top_p':1,
     };
 }
 app.post('/completion', async (req, res) => {
