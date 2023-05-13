@@ -12,14 +12,12 @@ const apiKey = process.env.AZURE_OPENAI_KEY;
 const base_url = process.env.BASE_URL;
 const deploymentName = process.env.DEPLOYMENT_NAME;
 
-let url = `${base_url}/openai/deployments/${deploymentName}/completions?api-version=2022-12-01`;
-
+let url = `${base_url}/openai/deployments/${deploymentName}/chat/completions?api-version=2023-03-15-preview`;
+console.log(url)
 function generatePrompt(prompt) {
+    let messages=[{"role":"user","content":prompt}]
     return {
-        'prompt': prompt,
-        'max_tokens': 1000,
-        'temperature': 0,
-        'top_p':1,
+        "messages": messages,
     };
 }
 app.post('/completion', async (req, res) => {
@@ -37,7 +35,8 @@ app.post('/completion', async (req, res) => {
             console.log(`HTTP Code: ${response.status} - ${response.statusText}`);
         } else {
             const completion = await response.json();
-            res.status(200).json({ result: completion.choices[0].text });
+            // res.status(200).json({ result: completion.choices[0].text });
+            res.status(200).json({"result":completion.choices[0].message.content})
         }
   
     } catch (error) {
